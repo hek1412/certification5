@@ -1,0 +1,30 @@
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:23.10.4.25-alpine
+    container_name: clickhouse_container
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - ./init_clickhouse:/docker-entrypoint-initdb.d
+    networks:
+      - postgres-click
+
+  postgres:
+    image: postgres:12.21
+    restart: always
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: testdb
+    ports:
+      - "5444:5432"
+    volumes:
+      - local_postgres_data:/var/lib/postgresql/data
+      - ./init_postgres:/docker-entrypoint-initdb.d
+networks:
+  postgres-click:
+    driver: bridge
+volumes:
+  local_postgres_data:
